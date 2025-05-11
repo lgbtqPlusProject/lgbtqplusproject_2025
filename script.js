@@ -376,8 +376,57 @@ function closeAnnouncement() {
     document.getElementById('announcement').style.display = 'none';
 }
 
-document.querySelector(".sidebar-toggle").addEventListener("click", function() {
-  document.querySelector(".sidebar").classList.toggle("open");
-});
 
+//Coming Out Stories - LIVE
+let currentStoryIndex = 0;
+let stories = [];
+let totalStories = 0;
 
+function fetchStories() {
+    fetch('get_stories.php')
+        .then(response => response.json())
+        .then(data => {
+            stories = data;
+            totalStories = stories.length;
+            showStory(currentStoryIndex); // Show the first story
+        })
+        .catch(error => console.error('Error fetching stories:', error));
+}
+
+function showStory(index) {
+    if (index >= totalStories) index = 0; // Loop back to the first story
+
+    // Create the HTML for the current story
+    const story = stories[index];
+    const storyHTML = `
+        <div class="story-card" style="opacity: 0; display: block;">
+            <h2>Coming Out Story</h2>
+            <p class="story-content">${story.story}</p>
+            <p class="story-details">By ${story.name}, ${story.location}</p>
+        </div>
+    `;
+
+    // Clear the container and append new story
+    const storyContainer = document.getElementById('story-container');
+    storyContainer.innerHTML = storyHTML;
+
+    // Fade in the new story
+    const currentStory = storyContainer.querySelector('.story-card');
+    setTimeout(() => {
+        currentStory.style.opacity = 1;
+    }, 100);
+
+    // Schedule the next story to appear after a delay
+    setTimeout(() => {
+        currentStory.style.opacity = 0; // Fade out the current story
+        setTimeout(() => {
+            currentStory.style.display = 'none'; // Hide the current story
+            showStory(index + 1); // Display the next story
+        }, 2000); // Wait for the fade-out to finish before switching to the next story
+    }, 8000); // Stay on each story for 8 seconds before transitioning
+}
+
+// Load stories when the page is ready
+window.onload = function() {
+    fetchStories();
+};
