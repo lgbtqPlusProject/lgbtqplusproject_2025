@@ -10,8 +10,9 @@
     <link rel="apple-touch-icon" href="images/favicon.ico"/>
     <!-- Awesome Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Link to CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/c01.css"/>
@@ -36,13 +37,24 @@
         <div id="scroll-indicator" onclick="showContentPage()">Scroll Down ↓</div>
     </section>
     
-    <!-- Coming Out Stories Showcase -->
     <section id="coming-out-stories" class="py-12 bg-gradient-to-r from-pink-400 via-purple-400 to-teal-400 text-white">
         <div class="max-w-5xl mx-auto px-4">
             <h2 class="text-3xl font-bold mb-8 text-center">🌈 Shared Coming Out Stories</h2>
-            <div id="story-container" class="space-y-8"></div>
+            <!-- Placeholder for stories -->
+            <div id="story-container">
+                <div id="story-card">
+                    <h3 id="story-name"></h3>
+                    <p id="story-text"></p>
+                    <p id="story-location"></p>
+                </div>
+                <div id="story-navigation">
+                    <button id="prev-btn"><<<</button>
+                    <button id="next-btn">>>></button>
+                </div>
+            </div>
         </div>
     </section>
+
     
     <section id="our-mission" class="section-mission-dark">
       <div class="mission-flex-container">
@@ -58,7 +70,8 @@
             to all generations. We honor the voices that came before us — and those still being written.
           </p>
           <p>
-            📲 Follow us on <a href="https://instagram.com/lgbtqplusproject" target="_blank">Instagram</a> for daily queer history and rare archival highlights.
+            📲 Follow us on <a href="https://www.instagram.com/lgbtqplusproject" target="_blank" class="text-pink-500 hover:text-pink-300 text-2xl" aria-label="Instagram">
+                <i class="fab fa-instagram"></i></a> for daily queer history and rare archival highlights.
           </p>
         </div>
 
@@ -67,7 +80,7 @@
           <p>
             🌈 <strong>Share Your Story:</strong><br>
             Everyone’s journey is unique. Submit your coming out story and add your voice to our living record.
-            <a href="#coming-out-stories" data-lightbox="inline">Click here</a> to share.
+            <a href="#comingOutSection" data-lightbox="inline">Click here</a> to share.
           </p>
           <p>
             🔍 <strong>Search the Archive:</strong><br>
@@ -75,7 +88,7 @@
           </p>
           <p>
             ⭐ <strong>Featured Figure:</strong><br>
-            Learn about this month’s spotlighted LGBTQ+ historical figure in the <a href="#featured-figure">Featured Section</a>.
+            Learn about this month’s spotlighted LGBTQ+ historical figure in the <a href="#bayardRustin">Featured Section</a>.
             Their legacy continues to inspire the movement.
           </p>
         </div>
@@ -168,9 +181,7 @@
       <div id="searchResultsBox" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm px-4">
         <div class="button bg-gray-900 text-white max-w-2xl w-full rounded-2xl shadow-2xl p-6 pt-12 relative overflow-y-auto max-h-[80vh]">
           <button onclick="closeSearchBox()" class="absolute top-4 right-4 p-2 text-white text-sm font-bold rounded-full shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300"
-            style="background-image: linear-gradient(to right, #9333ea, #ec4899, #14b8a6);">
-            ✖
-          </button>
+            style="background-image: linear-gradient(to right, #9333ea, #ec4899, #14b8a6);">Close</button>
           <div id="searchResultsContainer" class="space-y-4 text-sm sm:text-base leading-relaxed">
             <!-- JavaScript will inject results here -->
           </div>
@@ -187,7 +198,7 @@
         <div class="relative h-64 rounded-3xl overflow-hidden border-2 border-pink-500 shadow-lg">
           <div class="relative z-10 flex items-center justify-center h-full">
             <h2 class="text-4xl font-extrabold text-pink-300 drop-shadow-lg text-center px-4">
-              🌈 Explore Our Digital Archives
+              🌈 Explore Archive.org!
             </h2>
           </div>
         </div>
@@ -195,7 +206,7 @@
         <!-- Text Content Container -->
         <div class="bg-black rounded-3xl border border-pink-600 p-8 shadow-xl space-y-6">
           <p class="text-lg leading-relaxed text-gray-100">
-            In partnership with <strong class="text-teal-300">Archive.org</strong>, the LGBTQ+ Project proudly preserves queer legacies in an ever-growing digital library.
+            In partnership with <strong class="text-teal-300">Archive.org</strong>, the LGBTQ+ Project proudly preserves queer legacies in our ever growing curated database. 
           </p>
           <p class="text-lg leading-relaxed text-gray-100">
             Discover <span class="text-pink-400 font-semibold">rare zines</span>, <span class="text-pink-400 font-semibold">video footage</span>, <span class="text-pink-400 font-semibold">activist letters</span>, and <span class="text-pink-400 font-semibold">photographic history</span> you won't find anywhere else.
@@ -227,24 +238,26 @@
       </div>
     </section>
 
-      <!-- Search Results Popup (Dark Themed) -->
-      <div id="resultPopup" style="display: none;" class="z-50 fixed inset-0 flex items-center justify-center bg-black bg-opacity-90">
-        <div class="bg-gray-800 text-white p-6 rounded-2xl shadow-2xl max-w-xl w-full overflow-auto max-h-[80vh] relative">
-          <button onclick="closeSearchPopup()" class="absolute top-4 right-4 text-sm text-red-400 hover:text-red-600 font-semibold">✖ Close</button>
-          <div id="result" class="mt-6 text-sm sm:text-base leading-relaxed text-gray-100"></div>
-        </div>
-      </div>
-    </section>
+    <!-- Search Results Popup (LGBTQ+ Project Styled) -->
+    <div id="resultPopup" style="display: none;" class="z-50 fixed inset-0 flex items-center justify-center bg-gradient-to-br from-pink-100 via-purple-100 to-teal-100 bg-opacity-90">
+      <div class="relative bg-white text-gray-800 p-8 rounded-3xl shadow-2xl border-4 border-pink-200 max-w-2xl w-full max-h-[80vh] overflow-y-auto transition-all duration-300">
+        
+        <!-- Close Button -->
+        <button onclick="closeSearchPopup()"
+                class="absolute top-4 right-4 text-sm text-pink-600 hover:text-red-600 font-semibold tracking-wide uppercase">
+          Close
+        </button>
 
-      <!-- Search Results Popup -->
-      <div id="resultPopup" style="display: none;" class="z-50 fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-md">
-        <div class="bg-white text-black p-6 rounded-2xl shadow-2xl max-w-xl w-full overflow-auto max-h-[80vh] relative">
-          <button onclick="closeSearchPopup()" class="absolute top-4 right-4 text-sm text-red-500 hover:text-red-700 font-semibold">✖ Close</button>
-          <div id="result" class="mt-6 text-sm sm:text-base leading-relaxed"></div>
+        <!-- Header -->
+        <h2 class="text-2xl font-bold mb-4 border-b-2 border-pink-300 pb-2 text-purple-700">Search Results</h2>
+
+        <!-- Result Content -->
+        <div id="result" class="space-y-4 text-base leading-relaxed text-gray-700">
+          <!-- Dynamic content goes here -->
         </div>
       </div>
+    </div>
     </section>
-    
     
     
 <!-- Bayard Rustin Feature Section -->

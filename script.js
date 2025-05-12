@@ -1,10 +1,40 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Show Announcement
+    // Show Announcement after delay
     setTimeout(() => {
         const announcement = document.getElementById("announcement");
-        if (announcement) announcement.classList.add("show");
+        if (announcement) {
+            console.log('Announcement shown');
+            announcement.classList.add("show");
+        }
     }, 1000);
+
+    // Close Announcement
+    window.closeAnnouncement = function() {
+        const announcement = document.getElementById("announcement");
+        if (announcement) {
+            console.log('Closing announcement');
+            announcement.classList.remove("show");
+        }
+    };
+
+    // Close Search Box
+    window.closeSearchBox = function() {
+        const searchResultsBox = document.getElementById('searchResultsBox');
+        if (searchResultsBox) {
+            console.log('Closing search box');
+            searchResultsBox.style.display = 'none';
+        }
+    };
+    
+    //Close API Pop Search Results
+    window.closeSearchPopup = function () {
+        const searchPopup = document.getElementById('resultPopup');
+        if (searchPopup) {
+            searchPopup.style.display = 'none';
+            console.log("Search popup closed");
+        }
+    };
 
     // Landing Scroll
     const landing = document.getElementById('landing');
@@ -17,416 +47,213 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Navbar Scroll Handling
-    const navbar = document.getElementById('navbar');
-    const contentSection = document.getElementById('content');
-    const aboutSection = document.getElementById('about');
-    const imlSection = document.getElementById('iml-feature');
-    const lesSection = document.getElementById('lesbian-legacy');
-
-    function toggleNavbar() {
-        const scrollPosition = window.scrollY;
-
-        if (
-            (scrollPosition >= contentSection.offsetTop) ||
-            (scrollPosition >= aboutSection.offsetTop) ||
-            (scrollPosition >= imlSection.offsetTop) ||
-            (scrollPosition >= lesSection.offsetTop)
-        ) {
-            navbar.style.display = 'block';
-        } else {
-            navbar.style.display = 'none';
-        }
-    }
-
-    if (navbar && contentSection && aboutSection && imlSection && lesSection) {
-        window.addEventListener('scroll', toggleNavbar);
-        toggleNavbar();
-    }
-
-    // Contact Form Handling
-    const contactBtn = document.getElementById('contactBtn');
-    const contactPopup = document.getElementById('contactPopup');
-    const contactFormContent = document.getElementById('contactFormContent');
-    const successMessage = document.getElementById('successMessage');
-    const closeButton = document.querySelector('.close-btn1');
-
-    function openPopup() {
-        contactPopup.style.display = 'flex';
-        setTimeout(() => {
-            contactPopup.style.opacity = '1';
-        }, 10);
-    }
-
-    function closePopup() {
-        contactPopup.style.opacity = '0';
-        setTimeout(() => {
-            contactPopup.style.display = 'none';
-            if (contactFormContent) contactFormContent.reset();
-        }, 400);
-    }
-
-    if (contactBtn) {
-        contactBtn.addEventListener('click', function (event) {
-            event.preventDefault();
-            openPopup();
-            if (successMessage) successMessage.style.display = 'none';
-        });
-    }
-
-    if (closeButton) {
-        closeButton.addEventListener('click', closePopup);
-    }
-
-    if (contactFormContent) {
-        contactFormContent.addEventListener('submit', function (event) {
-            event.preventDefault();
-            const formData = new FormData(contactFormContent);
-
-            fetch(contactFormContent.action, {
-                method: "POST",
-                body: formData,
-                headers: { "Accept": "application/json" }
-            })
-            .then(response => {
-                if (response.ok) {
-                    successMessage.style.display = 'block';
-                    setTimeout(closePopup, 2000);
-                } else {
-                    alert("⚠️ Oops! There was a problem sending your message.");
-                }
-            })
-            .catch(error => alert("⚠️ Oops! There was a problem."));
-        });
-    }
-    
-    
-    console.log("Search button listeners are working.");  // Add this at the top of your script.js file
-
-    // Search Archive Handling
+    // Search Button Listeners
     const searchBtn = document.getElementById('searchBtn');
-    if (searchBtn) {
-        searchBtn.addEventListener('click', function () {
-            console.log("Archive Search Button Clicked");
-            const query = document.getElementById('searchInput').value.trim();
-            if (query) searchArchive(query);  // Make sure this function is defined somewhere!
-        });
-    }
-
-    // Search Database Handling
     const searchBtnDatabase = document.getElementById('searchBtnDatabase');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            const query = document.getElementById('searchInput').value.trim();
+            if (query) searchArchive(query);  // Ensure searchArchive is defined
+        });
+    }
     if (searchBtnDatabase) {
-        searchBtnDatabase.addEventListener('click', function () {
-            console.log("Database Search Button Clicked");
+        searchBtnDatabase.addEventListener('click', () => {
             const query = document.getElementById('searchBox').value.trim();
-            if (query) searchDatabase(query);  // Make sure this function is defined somewhere!
+            if (query) searchDatabase(query);  // Ensure searchDatabase is defined
         });
     }
 
-    // Trigger IML section reveal
-    const imlFeature = document.getElementById('iml-feature');
-    if (imlFeature) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    imlFeature.classList.add('show');
-                }
-            });
-        }, { threshold: 0.1 });
-        observer.observe(imlFeature);
-    }
-});
-
-// Database Search Function
-async function searchDatabase(query) {
-    if (!query || query.length < 2) {
-        alert('Please enter a valid search query.');
-        return;
-    }
-
-    const url = `https://lgbtqplusproject.onrender.com/search?query=${encodeURIComponent(query)}`;
-
-    try {
-        const response = await fetch(url, { method: 'GET' });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            alert(errorData.error || 'Error fetching results');
+    // Database Search Function
+    async function searchDatabase(query) {
+        if (!query || query.length < 2) {
+            alert('Please enter a valid search query.');
             return;
         }
 
-        const data = await response.json();
-        const resultDiv = document.getElementById('searchResultsContainer');
-
-        if (data.length > 0) {
-            let resultHTML = '<ul>';
+        const url = `https://www.lgbtqplusproject.org/search.php?query=${encodeURIComponent(query)}`;
+        try {
+            const response = await fetch(url, { method: 'GET' });
+            const data = await response.json();
+            const resultDiv = document.getElementById('result');
+            
+            let resultHTML = data.length ? '<ul class="list-disc pl-5 space-y-2">' : '<p>No results found.</p>';
             data.forEach(item => {
-                resultHTML += `<li><strong>Name:</strong> ${item.name} - <strong>Contribution:</strong> ${item.contribution} - <strong>Country:</strong> ${item.country}</li>`;
+                resultHTML += `<li><strong>Name:</strong> ${item.name}<br><strong>Contribution:</strong> ${item.contribution}<br><strong>Country:</strong> ${item.country}</li>`;
             });
+            resultHTML += data.length ? '</ul>' : '';
+            resultDiv.innerHTML = resultHTML;
+
+            document.getElementById('resultPopup').style.display = 'flex';
+        } catch (error) {
+            console.error('Error fetching data from the database:', error);
+            alert('⚠️ Error fetching data from the database. Please try again later.');
+        }
+    }
+
+    // Archive Search Function
+    async function searchArchive(query) {
+        if (!query) {
+            alert('Please enter a search query.');
+            return;
+        }
+      
+    // Log search query to server
+        if (location.hostname !== "localhost") {
+            fetch(`https://www.lgbtqplusproject.org/log_archive_search.php?query=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => console.log('Search logged:', data))
+                .catch(err => console.error('Logging failed:', err));
+        } else {
+            console.log('Local testing mode: skipping server logging.');
+        }
+
+        const apiUrl = `https://archive.org/advancedsearch.php?q=title:${encodeURIComponent(query)}&fl[]=title&fl[]=creator&rows=50&start=0&output=json`;
+        
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            const items = data.response.docs;
+
+            if (items.length === 0) {
+                alert('No results found.');
+                return;
+            }
+
+            // Select a random subset of results
+            const randomResults = getRandomItems(items, 5);
+            const resultDiv = document.getElementById('result');
+            let resultHTML = randomResults.length ? '<ul>' : '<p>No random results found.</p>';
+
+            randomResults.forEach(item => {
+                const title = item.title || 'No title available';
+                const creator = Array.isArray(item.creator)
+                    ? item.creator.join(', ')
+                    : (typeof item.creator === 'string' ? item.creator : 'N/A');
+
+                resultHTML += `
+                    <li class="mb-4">
+                        <a href="https://archive.org/search.php?query=title%3A${encodeURIComponent(title)}"
+                           target="_blank"
+                           class="block text-lg font-semibold text-pink-600 hover:text-teal-500 underline decoration-2 transition-all duration-200 ease-in-out">
+                            ${title}
+                        </a>
+                        <p class="text-sm text-gray-700"><strong>Creator:</strong> ${creator}</p>
+                    </li>
+                `;
+            });
+
             resultHTML += '</ul>';
             resultDiv.innerHTML = resultHTML;
-        } else {
-            resultDiv.innerHTML = '<p>No results found in the database.</p>';
+            document.getElementById('resultPopup').style.display = 'block';
+        } catch (error) {
+            console.error('Error fetching data from Archive.org:', error);
+            alert('⚠️ Error fetching data. Please try again later.');
+        }
+    }
+
+    // Random Item Selector
+    function getRandomItems(arr, num) {
+        const shuffled = arr.slice(0);
+        let i = arr.length, temp, randomIndex;
+
+        while (i !== 0) {
+            randomIndex = Math.floor(Math.random() * i);
+            i -= 1;
+            temp = shuffled[i];
+            shuffled[i] = shuffled[randomIndex];
+            shuffled[randomIndex] = temp;
         }
 
-        document.getElementById('searchResultsBox').style.display = 'block';
-    } catch (error) {
-        console.error('Error fetching data from the database:', error);
-        alert('⚠️ Error fetching data from the database. Please try again later.');
-    }
-}
-
-
-// Close Search Results Box
-function closeSearchBox() {
-    const searchResultsBox = document.getElementById('searchResultsBox');
-    if (searchResultsBox) {
-        searchResultsBox.style.display = 'none';
-    }
-}
-
-// Close Archive Search Popup
-function closeSearchPopup() {
-    const resultPopup = document.getElementById('resultPopup');
-    if (resultPopup) {
-        resultPopup.style.display = 'none';
-    }
-}
-
-
-// Archive Search Function
-async function searchArchive(query) {
-    if (!query) {
-        alert('Please enter a search query.');
-        return;
+        return shuffled.slice(0, num);
     }
 
-    const apiUrl = `https://archive.org/advancedsearch.php?q=title:${encodeURIComponent(query)}&fl[]=title&fl[]=creator&rows=50&start=0&output=json`;
+    // Modal functionality
+    function openModal(index) {
+        const story = stories[index];
+        if (!story) return;
 
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+        console.log('Opening modal for story:', story);
+        const modalContent = document.querySelector('.modal-content');
+        modalContent.classList.remove('fade-in');
+        void modalContent.offsetWidth;
+        modalContent.classList.add('fade-in');
 
-        // Log the full response to inspect the structure
-        console.log('API Response:', data);
-
-        const items = data.response.docs;
-
-        if (items.length === 0) {
-            alert('No results found.');
-            return;
-        }
-
-        // Select a random subset of results (e.g., 5 random results)
-        const randomResults = getRandomItems(items, 5);
-
-        const resultDiv = document.getElementById('result');
-        let resultHTML = randomResults.length > 0 ? '<ul>' : '<p>No random results found.</p>';
-
-        randomResults.forEach(item => {
-            // Log the item to see what we have
-            console.log('Item:', item);
-
-            const creators = Array.isArray(item.creator) ? item.creator.join(', ') : (item.creator || 'N/A');
-            const encodedTitle = encodeURIComponent(item.title);
-
-            resultHTML += `
-                <li>
-                    <strong>Title:</strong> 
-                    <a href="https://archive.org/search.php?query=${encodedTitle}" target="_blank">${item.title}</a><br>
-                    <strong>Creator:</strong> ${creators}
-                </li>
-            `;
-
-            // Log the search result to the database
-            logSearch(query, item.title, creators);
-        });
-
-        resultHTML += '</ul>';
-        resultDiv.innerHTML = resultHTML;
-
-        // Show the popup
-        const resultPopup = document.getElementById('resultPopup');
-        if (resultPopup) {
-            resultPopup.style.display = 'block';
-        }
-
-    } catch (error) {
-        console.error('Error fetching data from Archive.org:', error);
-        alert('⚠️ Error fetching data. Please try again later.');
-    }
-}
-
-
-// Function to get random items from an array
-function getRandomItems(arr, num) {
-    const shuffled = arr.slice(0); // Copy the array to avoid mutating the original
-    let i = arr.length, temp, randomIndex;
-
-    while (i !== 0) {
-        randomIndex = Math.floor(Math.random() * i);
-        i -= 1;
-        temp = shuffled[i];
-        shuffled[i] = shuffled[randomIndex];
-        shuffled[randomIndex] = temp;
+        document.getElementById('modalName').textContent = story.name;
+        document.getElementById('modalLocation').textContent = "From: " + story.location;
+        document.getElementById('modalStory').textContent = story.story;
+        document.getElementById('storyModal').style.display = "block";
     }
 
-    return shuffled.slice(0, num); // Return the first `num` random items
-}
-
-
-//log archive search query
-function logSearch(query, title, creator) {
-    console.log(`Attempting to log search for: ${query}`);
-    console.log(`Title: ${title}, Creator: ${creator}`);  // Log the parameters being sent
-
-    // Check if the data exists before sending
-    if (!title || !creator) {
-        console.error('Missing title or creator, cannot log search.');
-        return; // Exit early if title or creator is missing
+    // Modal Close Button
+    const modalClose = document.getElementById('modalClose');
+    if (modalClose) {
+        modalClose.onclick = function() {
+            console.log('Modal close button clicked');
+            document.getElementById('storyModal').style.display = "none";
+        };
     }
 
-    fetch('https://php.lgbtqplusproject.org/logsearch.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ searchQuery: query, title: title, creator: creator })  // Send title and creator along with searchQuery
-    })
-    .then(response => {
-        console.log('Response received:', response); // Log the full response to see if it’s valid
-        if (response.ok) {
-            return response.json();
-        } else {
-            console.error('Server responded with an error:', response);
-            return response.text().then(text => { throw new Error(text); });
-        }
-    })
-    .then(data => {
-        console.log('Data received:', data); // Log the parsed JSON data
-        if (data.success) {
-            console.log('✅ Search logged successfully:', data.message);
-        } else {
-            console.error('❌ Failed to log search:', data.message);
-        }
-    })
-    .catch(error => console.error('❌ Error logging search:', error));
-}
+    // Lightbox close button
+    const closeBtn = document.getElementById('lightbox-close');
+    const overlay = document.getElementById('lightbox-overlay');
+    const lightbox = document.getElementById('lightbox');
 
-document.addEventListener('DOMContentLoaded', function () {
-    const testimonyForm = document.getElementById('testimonyForm'); // Ensure this is your form ID
-    
-    if (testimonyForm) {
-        testimonyForm.addEventListener('submit', function (event) {
-            event.preventDefault();  // Prevent default form submission
-            
-            // Prepare form data
-            const formData = new FormData(testimonyForm);
-            const data = {};
-            
-            // Populate the data object with form data
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-
-            // Send the form data using Fetch API
-            fetch('https://php.lgbtqplusproject.org/logsearch.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json', // We are sending JSON data
-                },
-                body: JSON.stringify(data)  // Convert form data to JSON
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Your testimony has been submitted successfully!');
-                    testimonyForm.reset();  // Reset the form
-                } else {
-                    alert('There was an issue submitting your story: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('There was an error submitting your testimony.');
-            });
-        });
-    }
-});
-
-
-document.addEventListener('DOMContentLoaded', function () {
-    const elementsToShow = document.querySelectorAll('.form-text-box, .form-box');
-
-    function revealOnScroll() {
-        elementsToShow.forEach(element => {
-            const rect = element.getBoundingClientRect();
-            if (rect.top < window.innerHeight) {
-                element.classList.add('show-on-scroll');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            console.log('Lightbox close button clicked');
+            if (lightbox) {
+                lightbox.style.display = 'none'; // Close lightbox
             }
         });
     }
 
-    window.addEventListener('scroll', revealOnScroll);
-    revealOnScroll(); // Trigger animation if elements are already in view
+    // Close the lightbox if the overlay is clicked
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            console.log('Overlay clicked to close lightbox');
+            if (lightbox) {
+                lightbox.style.display = 'none'; // Close lightbox when clicking on the overlay
+            }
+        });
+    }
 });
 
-//close announcement
-function closeAnnouncement() {
-    document.getElementById('announcement').style.display = 'none';
-}
 
-
-//Coming Out Stories - LIVE
-let currentStoryIndex = 0;
+//Coming Out Showcase
 let stories = [];
-let totalStories = 0;
+let currentIndex = 0;
 
-function fetchStories() {
-    fetch('get_stories.php')
-        .then(response => response.json())
-        .then(data => {
-            stories = data;
-            totalStories = stories.length;
-            showStory(currentStoryIndex); // Show the first story
-        })
-        .catch(error => console.error('Error fetching stories:', error));
-}
-
-function showStory(index) {
-    if (index >= totalStories) index = 0; // Loop back to the first story
-
-    // Create the HTML for the current story
+function displayStory(index) {
     const story = stories[index];
-    const storyHTML = `
-        <div class="story-card" style="opacity: 0; display: block;">
-            <h2>Coming Out Story</h2>
-            <p class="story-content">${story.story}</p>
-            <p class="story-details">By ${story.name}, ${story.location}</p>
-        </div>
-    `;
-
-    // Clear the container and append new story
-    const storyContainer = document.getElementById('story-container');
-    storyContainer.innerHTML = storyHTML;
-
-    // Fade in the new story
-    const currentStory = storyContainer.querySelector('.story-card');
-    setTimeout(() => {
-        currentStory.style.opacity = 1;
-    }, 100);
-
-    // Schedule the next story to appear after a delay
-    setTimeout(() => {
-        currentStory.style.opacity = 0; // Fade out the current story
-        setTimeout(() => {
-            currentStory.style.display = 'none'; // Hide the current story
-            showStory(index + 1); // Display the next story
-        }, 2000); // Wait for the fade-out to finish before switching to the next story
-    }, 8000); // Stay on each story for 8 seconds before transitioning
+    document.getElementById('story-name').textContent = story.name;
+    document.getElementById('story-text').textContent = story.story;
+    document.getElementById('story-location').textContent = story.location;
 }
 
-// Load stories when the page is ready
-window.onload = function() {
-    fetchStories();
-};
+document.addEventListener("DOMContentLoaded", function () {
+    fetch('fetch_stories.php')
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+                stories = data;
+                displayStory(0);
+            } else {
+                document.getElementById('story-container').innerHTML = '<p>No stories found.</p>';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+
+    document.getElementById('prev-btn').addEventListener('click', () => {
+        if (stories.length > 0) {
+            currentIndex = (currentIndex - 1 + stories.length) % stories.length;
+            displayStory(currentIndex);
+        }
+    });
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+        if (stories.length > 0) {
+            currentIndex = (currentIndex + 1) % stories.length;
+            displayStory(currentIndex);
+        }
+    });
+});

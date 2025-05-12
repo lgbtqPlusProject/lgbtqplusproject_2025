@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thank You</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f472b6, #c084fc, #60a5fa);
+      background-size: 600% 600%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .confetti-canvas {
+      position: fixed;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1000;
+    }
+
+    .pride-flag {
+      width: 100px;
+      height: auto;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body class="text-white flex items-center justify-center min-h-screen relative">
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti" class="confetti-canvas"></canvas>
+
+  <div class="max-w-2xl text-center p-8 bg-white bg-opacity-10 rounded-2xl shadow-lg backdrop-blur-md z-10">
+    <h1 class="text-4xl font-bold mb-4">Thank You for Sharing Your Story! 🌈</h1>
+    <p class="text-lg leading-relaxed">Your voice matters. Your story helps others feel seen, heard, and celebrated.</p>
+    <p class="mt-4">Be on the lookout for our <strong>PRIDE Month celebration</strong>—your story will be featured! 🏳️‍🌈</p>
+    
+    <div class="mt-6 flex justify-center items-center flex-wrap">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Gay_Pride_Flag.svg/320px-Gay_Pride_Flag.svg.png" alt="Rainbow Flag" class="pride-flag">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/f/fd/LGBTQ%2B_rainbow_flag_Quasar_%22Progress%22_variant.svg" alt="Progress Flag" class="pride-flag">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Transgender_Pride_flag.svg" alt="Trans Flag" class="pride-flag">
+    </div>
+
+    <a href="index.html" class="mt-8 inline-block px-6 py-3 text-white bg-purple-600 rounded-full hover:bg-purple-700 transition font-semibold">Back to Home</a>
+  </div>
+
+  <!-- Confetti JS -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    const end = Date.now() + 3 * 1000;
+    const colors = ['#bb0000', '#ffffff', '#00bb00', '#0000bb', '#ff69b4', '#ffd700'];
+
+    (function frame() {
+      confetti({
+        particleCount: 4,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: colors
+      });
+      confetti({
+        particleCount: 4,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: colors
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    })();
+  </script>
+</body>
+</html>
