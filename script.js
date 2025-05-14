@@ -46,48 +46,93 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
-
-    // Search Button Listeners
-    const searchBtn = document.getElementById('searchBtn');
+    
+    
+    // Search Button Listener for Database
     const searchBtnDatabase = document.getElementById('searchBtnDatabase');
-    if (searchBtn) {
-        searchBtn.addEventListener('click', () => {
-            const query = document.getElementById('searchInput').value.trim();
-            if (query) searchArchive(query);  // Ensure searchArchive is defined
-        });
-    }
+
     if (searchBtnDatabase) {
         searchBtnDatabase.addEventListener('click', () => {
             const query = document.getElementById('searchBox').value.trim();
-            if (query) searchDatabase(query);  // Ensure searchDatabase is defined
+            if (query) {
+                searchHistoricalFiguresEvents(query);
+            } else {
+                alert('Please enter a search term.');
+            }
         });
     }
 
-    // Database Search Function
-    async function searchDatabase(query) {
-        if (!query || query.length < 2) {
-            alert('Please enter a valid search query.');
+    // Function to search the 'historical_figures_events' table in the database
+    async function searchHistoricalFiguresEvents(query) {
+        if (!query) {
+            alert("Please enter a search term.");
             return;
         }
 
-        const url = `https://www.lgbtqplusproject.org/search.php?query=${encodeURIComponent(query)}`;
+        // ✅ Log the search query
         try {
-            const response = await fetch(url, { method: 'GET' });
-            const data = await response.json();
-            const resultDiv = document.getElementById('result');
-            
-            let resultHTML = data.length ? '<ul class="list-disc pl-5 space-y-2">' : '<p>No results found.</p>';
-            data.forEach(item => {
-                resultHTML += `<li><strong>Name:</strong> ${item.name}<br><strong>Contribution:</strong> ${item.contribution}<br><strong>Country:</strong> ${item.country}</li>`;
-            });
-            resultHTML += data.length ? '</ul>' : '';
-            resultDiv.innerHTML = resultHTML;
+            const logResponse = await fetch(`http://localhost:8000/log_search.php?query=${encodeURIComponent(query)}`);
+            const logData = await logResponse.json();
 
-            document.getElementById('resultPopup').style.display = 'flex';
-        } catch (error) {
-            console.error('Error fetching data from the database:', error);
-            alert('⚠️ Error fetching data from the database. Please try again later.');
+            if (logData.success) {
+                console.log('✅ Search query logged successfully.');
+            } else {
+                console.warn('⚠️ Logging returned error:', logData.error);
+            }
+        } catch (logError) {
+            console.error('❌ Logging request failed:', logError);
         }
+
+        // ✅ Fetch the search results
+        const url = `http://localhost:8000/search.php?query=${encodeURIComponent(query)}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            const resultBox = document.getElementById('searchResultsContainer');
+            if (!data.length) {
+                resultBox.innerHTML = '<p class="text-red-600">No results found.</p>';
+            } else {
+                resultBox.innerHTML = data.map(event =>
+                    `<div class="mb-6 p-6 border border-purple-300 rounded-lg shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl bg-gradient-to-r from-purple-100 via-pink-200 to-teal-100">
+                        <h3 class="text-3xl font-bold text-purple-800 mb-4 hover:text-purple-600 transition-all duration-300 ease-in-out">${event.name || 'No name available'}</h3>
+                        <p class="text-lg text-gray-700"><strong>Years:</strong> ${event.years_relevant || 'No years available'}</p>
+                        <p class="text-lg text-gray-700 mb-4"><strong>Location:</strong> ${event.location || 'No location available'}</p>
+                        <p class="text-md text-gray-800 leading-relaxed">${event.description || 'No description available'}</p>
+                    </div>`
+                ).join('');
+
+                // Adjust container style
+                const searchBox = document.getElementById('searchResultsBox');
+                searchBox.style.maxWidth = '30vw';
+                searchBox.style.maxHeight = '150vh';
+                searchBox.style.overflowY = 'auto';
+                searchBox.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            alert('⚠️ Unable to fetch results. Please try again.');
+        }
+    }
+    
+    
+    // Event Results Popup Close
+    function closeEventPopup() {
+        document.getElementById('eventResultPopup').style.display = 'none';
+    }
+    
+    //Search Button Archive
+    const searchBtnArchive = document.getElementById('searchBtnArchive');
+    if (searchBtnArchive) {
+        searchBtnArchive.addEventListener('click', () => {
+            const query = document.getElementById('searchBox').value.trim();
+            if (query) {
+                searchArchive(query);
+            } else {
+                alert('Please enter a search term.');
+            }
+        });
     }
 
     // Archive Search Function
@@ -96,10 +141,10 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Please enter a search query.');
             return;
         }
-      
-    // Log search query to server
+
+        // Log search query
         if (location.hostname !== "localhost") {
-            fetch(`https://www.lgbtqplusproject.org/log_archive_search.php?query=${encodeURIComponent(query)}`)
+            fetch(`http://localhost:8000/log_archive_search.php?query=${encodeURIComponent(query)}`)
                 .then(res => res.json())
                 .then(data => console.log('Search logged:', data))
                 .catch(err => console.error('Logging failed:', err));
@@ -108,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const apiUrl = `https://archive.org/advancedsearch.php?q=title:${encodeURIComponent(query)}&fl[]=title&fl[]=creator&rows=50&start=0&output=json`;
-        
+
         try {
             const response = await fetch(apiUrl);
             const data = await response.json();
@@ -119,7 +164,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            // Select a random subset of results
             const randomResults = getRandomItems(items, 5);
             const resultDiv = document.getElementById('result');
             let resultHTML = randomResults.length ? '<ul>' : '<p>No random results found.</p>';
@@ -138,8 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             ${title}
                         </a>
                         <p class="text-sm text-gray-700"><strong>Creator:</strong> ${creator}</p>
-                    </li>
-                `;
+                    </li>`;
             });
 
             resultHTML += '</ul>';
@@ -256,4 +299,58 @@ document.addEventListener("DOMContentLoaded", function () {
             displayStory(currentIndex);
         }
     });
+});
+
+//Coming Out Story Countdown
+const countdown = () => {
+    const endDate = new Date("June 1, 2025 00:00:00").getTime();
+    const now = new Date().getTime();
+    const timeLeft = endDate - now;
+
+    if (timeLeft < 0) {
+      document.getElementById("countdown").innerHTML = "🎉 The Coming Out Stories are LIVE!";
+      return;
+    }
+
+    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+    document.getElementById("days").textContent = String(days).padStart(2, '0');
+    document.getElementById("hours").textContent = String(hours).padStart(2, '0');
+    document.getElementById("minutes").textContent = String(minutes).padStart(2, '0');
+    document.getElementById("seconds").textContent = String(seconds).padStart(2, '0');
+  };
+
+  setInterval(countdown, 1000);
+  countdown(); // initial call
+
+document.getElementById("notify-button").addEventListener("click", async () => {
+  const email = prompt("Enter your email to be notified when the Coming Out Story Section goes live:");
+
+  if (email && email.includes("@")) {
+    try {
+      const response = await fetch("http://localhost:8000/notify.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+
+      const result = await response.json();
+
+      if (result.status === "success") {
+        alert("✅ You’re on the list! We’ll notify you.");
+        document.getElementById("notify-button").textContent = "✅ You'll Be Notified!";
+        document.getElementById("notify-button").disabled = true;
+        document.getElementById("notify-button").style.backgroundColor = "#4caf50";
+      } else {
+        alert("⚠️ " + result.message);
+      }
+    } catch (err) {
+      alert("An error occurred while submitting your email.");
+    }
+  } else if (email !== null) {
+    alert("Please enter a valid email address.");
+  }
 });

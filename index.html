@@ -40,6 +40,15 @@
     <section id="coming-out-stories" class="py-12 bg-gradient-to-r from-pink-400 via-purple-400 to-teal-400 text-white">
         <div class="max-w-5xl mx-auto px-4">
             <h2 class="text-3xl font-bold mb-8 text-center">🌈 Shared Coming Out Stories</h2>
+            <div class="countdown-container">
+              <div id="countdown">
+                <span class="time-part" style="--order:1"><span id="days">00</span> Days</span>
+                <span class="time-part" style="--order:2"><span id="hours">00</span> Hours</span>
+                <span class="time-part" style="--order:3"><span id="minutes">00</span> Minutes</span>
+                <span class="time-part" style="--order:4"><span id="seconds">00</span> Seconds</span>
+              </div>
+              <button id="notify-button">🔔 Notify Me</button>
+            </div>
             <!-- Placeholder for stories -->
             <div id="story-container">
                 <div id="story-card">
@@ -136,7 +145,7 @@
             </section>
     
     <!--Curated Database-->
-    <section id="content" class="2 bg-gradient-to-r from-purple-600 via-pink-500 to-teal-400 text-white py-10 sm:py-12">
+    <section id="content" class="bg-gradient-to-r from-purple-600 via-pink-500 to-teal-400 text-white py-10 sm:py-12">
       <div class="section-wrapper2">
         
         <!-- Left Column: Search + Title -->
@@ -181,7 +190,7 @@
       <div id="searchResultsBox" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm px-4">
         <div class="button bg-gray-900 text-white max-w-2xl w-full rounded-2xl shadow-2xl p-6 pt-12 relative overflow-y-auto max-h-[80vh]">
           <button onclick="closeSearchBox()" class="absolute top-4 right-4 p-2 text-white text-sm font-bold rounded-full shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300"
-            style="background-image: linear-gradient(to right, #9333ea, #ec4899, #14b8a6);">Close</button>
+            style="background-image: linear-gradient(to right, #9333ea, #ec4899, #14b8a6);">X</button>
           <div id="searchResultsContainer" class="space-y-4 text-sm sm:text-base leading-relaxed">
             <!-- JavaScript will inject results here -->
           </div>
@@ -228,7 +237,7 @@
             class="w-full sm:w-2/3 p-3 rounded-md text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
           />
           <button
-            id="searchBtn"
+            id="searchBtnArchive"
             class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 via-pink-500 to-teal-400 text-white font-bold rounded-md shadow-md hover:scale-105 transition"
           >
             🔍 Search

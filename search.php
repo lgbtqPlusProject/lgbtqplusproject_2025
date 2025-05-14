@@ -9,8 +9,8 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 // Database credentials
 $host = "localhost";  // or 127.0.0.1 if needed
-$user = "timoteo";
-$password = "Rubenom3626#";
+$user = "root";
+$password = "";
 $database = "lgbtqplusproject";
 
 // Connect to MySQL
@@ -29,7 +29,7 @@ if (empty($query)) {
 }
 
 // Build SQL query
-$sql = "SELECT * FROM historicalFigures WHERE name LIKE ? OR contribution LIKE ? OR country LIKE ?";
+$sql = "SELECT * FROM historical_figures_events WHERE name LIKE ? OR description LIKE ? OR location LIKE ?";
 $stmt = $conn->prepare($sql);
 $searchTerm = "%{$query}%";
 $stmt->bind_param("sss", $searchTerm, $searchTerm, $searchTerm);
